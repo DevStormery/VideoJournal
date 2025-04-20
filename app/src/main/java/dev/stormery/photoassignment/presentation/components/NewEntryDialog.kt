@@ -144,7 +144,11 @@ fun NewEntryDialog(
 
                     Button(
                         onClick = {
-                            // Handle save action
+                            viewModel.addJournal(
+                                filePath = videoUri.toString(),
+                                description = description.value,
+                                timestamp = System.currentTimeMillis()
+                            )
                         },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     ) {

@@ -1,4 +1,4 @@
-CREATE TABLE journal_entity (
+CREATE TABLE journalEntity (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     file_path TEXT NOT NULL,
     description TEXT,
@@ -6,15 +6,15 @@ CREATE TABLE journal_entity (
 );
 
 selectAll:
-SELECT * FROM journal_entity
+SELECT * FROM journalEntity
 ORDER BY timestamp DESC;
 
 insertVideo:
-INSERT INTO journal_entity(file_path, description, timestamp)
+INSERT INTO journalEntity(file_path, description, timestamp)
 VALUES (?, ?, ?);
 
 deleteVideoById:
-DELETE FROM journal_entity WHERE id = ?;
+DELETE FROM journalEntity WHERE id = ?;
 
 updateDescription:
-UPDATE journal_entity SET description = ? WHERE id = ?;
+UPDATE journalEntity SET description = ? WHERE id = ?;

@@ -42,10 +42,8 @@ android {
 
 sqldelight {
     databases {
-        create("VideoDatabase") {
-            packageName.set("dev.stormery.photoassignment.data.local")
-            // Optional: specify the directory where .sq files are located
-            srcDirs.setFrom("src/data/local")
+        create("JournalDatabase") {
+            packageName.set("dev.stormery.photoassignment.database")
         }
     }
 }
@@ -54,6 +52,9 @@ dependencies {
 
     // SQLDelight
     implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
+    implementation("app.cash.sqldelight:android-driver:2.0.2")
+    implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
+    implementation("app.cash.sqldelight:runtime:2.0.2")
 
     //Koin
     implementation("io.insert-koin:koin-android:3.5.0")

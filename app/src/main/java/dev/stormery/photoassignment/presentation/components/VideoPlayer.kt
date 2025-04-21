@@ -18,7 +18,7 @@ fun VideoPlayer(uri: Uri) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
-            playWhenReady = true
+            playWhenReady = false
         }
     }
 

@@ -1,6 +1,7 @@
 package dev.stormery.photoassignment.presentation.components
 
-import android.widget.ImageView
+import android.Manifest
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,7 +38,7 @@ import dev.stormery.photoassignment.R
 import dev.stormery.photoassignment.core.CameraHelper
 import dev.stormery.photoassignment.presentation.MainScreenViewModel
 import dev.stormery.photoassignment.presentation.camera.CameraUIEvent
-import dev.stormery.photoassignment.presentation.camera.CameraViewModel
+import dev.stormery.photoassignment.presentation.NewJournalViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -46,24 +48,38 @@ import java.util.Locale
 fun NewEntryDialog(
 ) {
     val viewModel: MainScreenViewModel = koinViewModel()
+    val newJournalViewModel: NewJournalViewModel = koinViewModel()
     val showDialog = viewModel.showNewEntryDialog.collectAsState().value
+    val journalData = newJournalViewModel.journalData.collectAsState()
     val context = LocalContext.current
 
-    val cameraViewModel = koinViewModel<CameraViewModel>()
-    val videoUri by cameraViewModel.videoUri.collectAsState()
-    val videoSuccessfullyCaptured = remember { mutableStateOf(false) }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted->
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
         if (isGranted) {
-            // Permission is granted, proceed with camera access
-            cameraViewModel.onCameraPermissionGranted()
+            // Proceed with camera action
+            newJournalViewModel.onCameraPermissionGranted()
         } else {
-            // Permission is denied, show a message or handle accordingly
-            cameraViewModel.onCameraPermissionDenied()
+            newJournalViewModel.onCameraPermissionDenied()
         }
     }
+    val storagePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Now ask for camera
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            // Handle storage denied
+            Toast.makeText(context, "Storage permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+
+    val videoSuccessfullyCaptured = remember { mutableStateOf(false) }
+
     val videoCaptureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo()
     ) { success ->
@@ -73,17 +89,20 @@ fun NewEntryDialog(
         } else {
             // Handle the failure
             videoSuccessfullyCaptured.value = false
+
         }
     }
+
     LaunchedEffect(Unit) {
-        cameraViewModel.uiEvent.collect { event ->
+        newJournalViewModel.uiEvent.collect { event ->
             when (event) {
                 is CameraUIEvent.StartVideoCapture -> {
-                    val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                    val videoFile = CameraHelper().createVideoFile(context, timestamp)
+                    val timestamp = System.currentTimeMillis()
+                    newJournalViewModel.setTimestamp(timestamp)
+                    val videoFile = CameraHelper().createVideoFile(context, timestamp.toString())
                     val uri = CameraHelper().getVideoUri(context, videoFile)
                     videoCaptureLauncher.launch(uri)
-                    cameraViewModel.setVideoUri(uri)
+                    newJournalViewModel.setVideoUri(uri)
                 }
                 is CameraUIEvent.ShowPermissionDeniedMessage -> {
                     // Show permission denied message
@@ -103,6 +122,7 @@ fun NewEntryDialog(
     if(showDialog){
         Dialog(
             onDismissRequest = {
+                newJournalViewModel.resetEntryState()
                 viewModel.hideNewEntryDialog()
             },
         ) {
@@ -114,41 +134,48 @@ fun NewEntryDialog(
             ) {
                 Column(
                     Modifier.fillMaxWidth().weight(1f).padding(16.dp)
-                        .border(1.dp, color = Color.Black)
+                        .border(1.dp, color = Color.Black),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    if(videoUri != null && videoSuccessfullyCaptured.value){
-                        VideoPlayer(uri = videoUri!! )
+                    if(journalData.value.videoUri != null && videoSuccessfullyCaptured.value){
+                        VideoPlayer(uri = journalData.value.videoUri!! )
                     }else{
                         Image(
                             painter = painterResource(R.drawable.camera),
                             contentDescription = "Image",
-                            modifier = Modifier.fillMaxSize().clickable {
-                                permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    Manifest.permission.READ_MEDIA_VIDEO
+                                } else {
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                }
+                                storagePermissionLauncher.launch(storagePermission)
                             }
                         )
+                        Text(
+                            text = "Click to take a video",
+                            modifier = Modifier.padding(8.dp)
+                        )
                     }
+
                 }
                 Column(
                     Modifier.fillMaxWidth().weight(1f).padding(16.dp)
                 ){
-                    val description = remember { mutableStateOf("") }
                     TextField(
-                        value = description.value,
-                        onValueChange = {
-                            description.value = it
-                        },
-                        label = { Text("Description") },
-                        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f).imePadding(),
-
+                            value = journalData.value.description?: "",
+                            onValueChange = {
+                                newJournalViewModel.setDescription(it)
+                            },
+                            label = { Text("Description (optional)") },
+                            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f).imePadding(),
                         )
 
                     Button(
                         onClick = {
-                            viewModel.addJournal(
-                                filePath = videoUri.toString(),
-                                description = description.value,
-                                timestamp = System.currentTimeMillis()
-                            )
+                            newJournalViewModel.saveJournal{
+                                viewModel.hideNewEntryDialog()
+                            }
                         },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                     ) {

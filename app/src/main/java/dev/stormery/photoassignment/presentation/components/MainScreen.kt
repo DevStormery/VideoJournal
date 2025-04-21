@@ -1,7 +1,10 @@
 package dev.stormery.photoassignment.presentation.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -10,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import dev.stormery.photoassignment.presentation.MainScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -32,15 +36,25 @@ fun MainScreen(
                     Text("Add New Entry")
                 }
             }
-            items(journals.value.size){
-                val journal = journals.value[it]
-                Text(
-                    text = "Journal Entry: ${journal.description} + ${journal.timestamp}",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                )
+            when{
+                journals.value.isEmpty() -> {
+                    item {
+                        Text(
+                            text = "No entries found",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
+                }
+                else -> {
+                    items(journals.value.size){
+                        val journal = journals.value[it]
+                        JournalEntryRow(journalData = journal)
+                    }
+                }
             }
+
         }
     }
     NewEntryDialog()

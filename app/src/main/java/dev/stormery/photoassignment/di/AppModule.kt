@@ -8,14 +8,14 @@ import dev.stormery.photoassignment.domain.repository.JournalRepository
 import dev.stormery.photoassignment.domain.usecase.AddJournalUseCase
 import dev.stormery.photoassignment.domain.usecase.GetJournalsUseCase
 import dev.stormery.photoassignment.presentation.MainScreenViewModel
-import dev.stormery.photoassignment.presentation.camera.CameraViewModel
+import dev.stormery.photoassignment.presentation.NewJournalViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
-    viewModel { MainScreenViewModel(get(),get()) }
-    viewModel { CameraViewModel() }
+    viewModel { MainScreenViewModel(get()) }
+    viewModel { NewJournalViewModel(get()) }
 }
 
 val dataModule = module {

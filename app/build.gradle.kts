@@ -40,6 +40,7 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 sqldelight {
@@ -68,6 +69,29 @@ dependencies {
 
     //Refresh
     implementation("androidx.compose.material:material:1.8.0-rc03")
+
+    // Test core
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.5.0")
+
+    // Mockito
+    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    // Koin Test
+    testImplementation("io.insert-koin:koin-test:3.5.0")
+    testImplementation("io.insert-koin:koin-test-junit4:3.5.0")
+
+    // Coroutines Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    //StateFlow test
+    testImplementation("app.cash.turbine:turbine:0.12.1")
+
+    testImplementation("org.robolectric:robolectric:4.14.1")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

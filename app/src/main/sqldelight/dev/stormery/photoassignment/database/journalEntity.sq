@@ -1,17 +1,17 @@
 CREATE TABLE journalEntity (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     file_path TEXT NOT NULL,
+    videoPath TEXT NOT NULL,
     description TEXT,
     timestamp INTEGER NOT NULL
 );
 
 selectAll:
-SELECT * FROM journalEntity
-ORDER BY timestamp DESC;
+SELECT * FROM journalEntity;
 
 insertVideo:
-INSERT INTO journalEntity(file_path, description, timestamp)
-VALUES (?, ?, ?);
+INSERT INTO journalEntity(file_path, videoPath, description, timestamp)
+VALUES (?,  ?, ?, ?);
 
 deleteVideoById:
 DELETE FROM journalEntity WHERE id = ?;

@@ -24,21 +24,31 @@ class JournalRepositoryImpl(
         ).map { list ->
             list.map {
                 JournalData(
+                    id = it.id,
                     videoUri = it.file_path.toUri(),
+                    videoPath = it.videoPath,
                     description = it.description,
                     timestamp = it.timestamp
                 )
-            }
+            }.sortedByDescending { it.timestamp }
         }
     }
 
-    override suspend fun insertJournal(filePath: String, description: String?, timestamp: Long) {
+    override suspend fun insertJournal(filePath: String, videoPath:String,description: String?, timestamp: Long) {
         return withContext(Dispatchers.IO){
             queries.insertVideo(
                 file_path = filePath,
+                videoPath = videoPath,
                 description = description,
-                timestamp = timestamp
+                timestamp = timestamp,
+
             )
+        }
+    }
+
+    override suspend fun deleteJournal(journal: JournalData) {
+        return withContext(Dispatchers.IO) {
+            queries.deleteVideoById(journal.id)
         }
     }
 

@@ -1,3 +1,5 @@
+import org.gradle.util.internal.VersionNumber.version
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -63,6 +65,9 @@ dependencies {
     //Exoplayer
     implementation("androidx.media3:media3-exoplayer:1.2.0")
     implementation("androidx.media3:media3-ui:1.2.0")
+
+    //Refresh
+    implementation("androidx.compose.material:material:1.8.0-rc03")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

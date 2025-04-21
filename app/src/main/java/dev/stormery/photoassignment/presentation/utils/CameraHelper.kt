@@ -1,4 +1,4 @@
-package dev.stormery.photoassignment.core
+package dev.stormery.photoassignment.presentation.utils
 
 import android.content.Context
 import android.net.Uri

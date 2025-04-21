@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.stormery.photoassignment.domain.usecase.AddJournalUseCase
-import dev.stormery.photoassignment.presentation.camera.CameraUIEvent
+import dev.stormery.photoassignment.presentation.camera.UIEvent
 import dev.stormery.photoassignment.presentation.model.JournalData
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ class NewJournalViewModel(
     private val addJournalUseCase: AddJournalUseCase,
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<CameraUIEvent>()
+    private val _uiEvent = MutableSharedFlow<UIEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
     private val _journalData = MutableStateFlow(JournalData())
@@ -25,13 +25,19 @@ class NewJournalViewModel(
 
     fun onCameraPermissionGranted(){
         viewModelScope.launch {
-            _uiEvent.emit(CameraUIEvent.StartVideoCapture)
+            _uiEvent.emit(UIEvent.StartVideoCapture)
         }
     }
 
-    fun onCameraPermissionDenied() {
+    fun onPermissionDenied() {
         viewModelScope.launch {
-            _uiEvent.emit(CameraUIEvent.ShowPermissionDeniedMessage)
+            _uiEvent.emit(UIEvent.ShowPermissionDenied)
+        }
+    }
+
+    fun onPermanentlyDenied() {
+        viewModelScope.launch {
+            _uiEvent.emit(UIEvent.OnPermanentlyDenied)
         }
     }
 
@@ -60,7 +66,7 @@ class NewJournalViewModel(
     }
     fun saveJournal(onSavedEntry: () -> Unit) = run {
         viewModelScope.launch {
-            addJournalUseCase(_journalData.value.videoUri.toString(), _journalData.value.description, _journalData.value.timestamp)
+            addJournalUseCase(_journalData.value.videoUri.toString(), _journalData.value.videoPath, _journalData.value.description, _journalData.value.timestamp)
             resetEntryState()
             onSavedEntry()
         }
@@ -71,9 +77,18 @@ class NewJournalViewModel(
             _journalData.update {
                 it.copy(
                     videoUri = null,
+                    videoPath = "",
                     description = null,
                     timestamp = System.currentTimeMillis()
                 )
+            }
+        }
+    }
+
+    fun setVideoPath(videoPath: String) {
+        viewModelScope.launch {
+            _journalData.update {
+                it.copy(videoPath = videoPath)
             }
         }
     }

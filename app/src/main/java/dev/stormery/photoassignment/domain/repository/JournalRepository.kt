@@ -6,5 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface JournalRepository {
     fun getJournals(): Flow<List<JournalData>>
-    suspend fun insertJournal(filePath:String, description: String?, timestamp: Long)
+    suspend fun insertJournal(filePath:String, videoPath:String, description: String?, timestamp: Long)
+    suspend fun deleteJournal(journal: JournalData)
 }

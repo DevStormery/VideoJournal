@@ -24,7 +24,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.stormery.photoassignment.R
 import dev.stormery.photoassignment.presentation.MainScreenViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -67,7 +69,7 @@ fun MainScreen(
                             viewModel.showNewEntryDialog()
                         },
                     ) {
-                        Text("Add New Entry")
+                        Text(stringResource(R.string.add_new_entry))
                     }
                 }
             }
@@ -78,7 +80,7 @@ fun MainScreen(
                             Modifier.fillMaxWidth().padding(16.dp),
                         ){
                             Text(
-                                text = "No entries found",
+                                text = stringResource(R.string.no_entries_found),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp)

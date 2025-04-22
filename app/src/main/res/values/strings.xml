@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">PhotoAssignment</string>
+    <string name="app_name">Mini Video Journal</string>
+    <string name="read_more_text">read more</string>
+    <string name="show_less_text">read more</string>
+    <string name="video_file_not_found">Video file not found</string>
+    <string name="add_new_entry">Add New Entry</string>
+    <string name="no_entries_found">No entries found</string>
+    <string name="click_to_take_a_video">Click to take a video</string>
+    <string name="enable_permissons_in_settings">Enable permission in settings</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="description_text">Description (optional)</string>
+    <string name="save_text">Save</string>
+    <string name="cancel_text">Cancel</string>
 </resources>

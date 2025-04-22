@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,7 +64,6 @@ fun JournalEntryRow(journalData: JournalData) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-              //  .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -86,6 +86,7 @@ fun JournalEntryRow(journalData: JournalData) {
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val errorText = stringResource(R.string.video_file_not_found)
                 Icon(
                     painter = painterResource(R.drawable.ic_share),
                     tint = MaterialTheme.colorScheme.primary,
@@ -97,7 +98,7 @@ fun JournalEntryRow(journalData: JournalData) {
                         }else{
                             Toast.makeText(
                                 context,
-                                "Video file not found",
+                                errorText,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

@@ -13,10 +13,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.stormery.photoassignment.R
 
 @Composable
 fun ExpandableText(
@@ -45,7 +47,7 @@ fun ExpandableText(
 
         if (hasOverflow) {
             Text(
-                text = if (isExpanded) "Show Less" else "read more",
+                text = if (isExpanded) stringResource(R.string.show_less_text) else stringResource(R.string.read_more_text),
                 style = style.copy(color = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.padding(top = 4.dp)
             )

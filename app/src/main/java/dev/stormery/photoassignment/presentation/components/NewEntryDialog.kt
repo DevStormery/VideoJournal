@@ -38,10 +38,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import dev.stormery.photoassignment.R
+import dev.stormery.photoassignment.core.Consts.CAMERA_PERMISSION
+import dev.stormery.photoassignment.core.Consts.getVideoPermissions
 import dev.stormery.photoassignment.presentation.utils.CameraHelper
 import dev.stormery.photoassignment.presentation.MainScreenViewModel
 import dev.stormery.photoassignment.presentation.camera.UIEvent
@@ -54,18 +57,13 @@ import java.io.File
 fun NewEntryDialog(
     onDismissRequest : () -> Unit = {},
 ) {
-
     val viewModel: MainScreenViewModel = koinViewModel()
     val newJournalViewModel: NewJournalViewModel = koinViewModel()
     val showDialog = viewModel.showNewEntryDialog.collectAsState().value
     val journalData = newJournalViewModel.journalData.collectAsState()
     val context = LocalContext.current
     val activity = context as Activity
-    val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.READ_MEDIA_VIDEO
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
+    val storagePermission = getVideoPermissions()
 
     val cameraPermissionHandler = remember {
         PermissionHandler(
@@ -91,7 +89,7 @@ fun NewEntryDialog(
             activity = activity,
             permission = storagePermission,
             onGranted = {
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                cameraPermissionLauncher.launch(CAMERA_PERMISSION)
             },
             onDenied = { newJournalViewModel.onPermissionDenied() },
             onPermanentlyDenied = {
@@ -146,10 +144,10 @@ fun NewEntryDialog(
                 }
                 is UIEvent.ShowPermissionDenied -> {
                     // Show permission denied message
-                    Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
                 }
                 is UIEvent.OnPermanentlyDenied -> {
-                    Toast.makeText(context, "Enable permission in settings", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.enable_permissons_in_settings), Toast.LENGTH_LONG).show()
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.fromParts("package", context.packageName, null)
                     }
@@ -173,29 +171,39 @@ fun NewEntryDialog(
                     .border(1.dp, color = Color.Black)
                     .clip(RoundedCornerShape(16.dp))
             ) {
-                Column(
-                    Modifier.fillMaxWidth().weight(1f).padding(16.dp)
-                        .border(1.dp, color = Color.Black).clip(RoundedCornerShape(16.dp)),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ){
-                    if(journalData.value.videoUri != null && videoSuccessfullyCaptured.value){
+
+                if(journalData.value.videoUri != null && videoSuccessfullyCaptured.value){
+                    Column(
+                        Modifier.fillMaxWidth().weight(1f).padding(16.dp)
+                            .border(1.dp, color = Color.Black).clip(RoundedCornerShape(16.dp)),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         VideoPlayer(uri = journalData.value.videoUri!! )
-                    }else{
+                    }
+                }else{
+                    Column(
+                        Modifier.fillMaxWidth().weight(1f).padding(16.dp)
+                            .border(1.dp, color = Color.Black).clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                storagePermissionHandler.checkAndRequest(storagePermissionLauncher)
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.camera),
 
                             contentDescription = "Image",
-                            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f).clickable {
-                                storagePermissionHandler.checkAndRequest(storagePermissionLauncher)
-                            }
+                            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f)
                         )
                         Text(
-                            text = "Click to take a video",
+                            text = stringResource(R.string.click_to_take_a_video),
                             modifier = Modifier.padding(8.dp)
                         )
                     }
 
                 }
+
+
                 Column(
                     Modifier.fillMaxWidth().weight(1f).padding(16.dp)
                 ){
@@ -204,7 +212,7 @@ fun NewEntryDialog(
                             onValueChange = {
                                 newJournalViewModel.setDescription(it)
                             },
-                            label = { Text("Description (optional)") },
+                            label = { Text(stringResource(R.string.description_text))},
                             modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f).imePadding(),
                         )
 
@@ -222,7 +230,7 @@ fun NewEntryDialog(
                             contentColor = MaterialTheme.colorScheme.background
                         )
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.save_text))
                     }
                     Spacer(modifier = Modifier.fillMaxHeight(0.1f))
                     Button(
@@ -236,17 +244,11 @@ fun NewEntryDialog(
                             contentColor = MaterialTheme.colorScheme.background
                         )
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel_text))
                     }
                 }
             }
 
         }
     }
-}
-
-@Preview
-@Composable
-fun NewEntryDialogPreview() {
-    NewEntryDialog()
 }
